@@ -1,0 +1,5 @@
+.data/
+.run/
+.tools/
+target/
+*.log

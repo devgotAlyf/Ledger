@@ -1,0 +1,60 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: ledger
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/ledger}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: transaction-audit-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.example.ledger.model
+        spring.json.value.default.type: com.example.ledger.model.TransactionEvent
+        spring.json.use.type.headers: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+audit:
+  kafka:
+    transaction-topic: ${TRANSACTION_TOPIC:transaction-events}
+  claude:
+    api-key: ${CLAUDE_API_KEY:}
+    base-url: ${CLAUDE_BASE_URL:https://api.anthropic.com}
+    model: ${CLAUDE_MODEL:claude-3-5-sonnet-latest}
+    version: ${CLAUDE_VERSION:2023-06-01}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    try-it-out-enabled: true
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs

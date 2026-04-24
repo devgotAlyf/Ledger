@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: ledger-api
+    runtime: docker
+    plan: starter
+    healthCheckPath: /healthz
+    maxShutdownDelaySeconds: 120
+    envVars:
+      - key: JAVA_OPTS
+        value: -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ledger-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: ledger-cache
+          property: connectionString
+      - key: TRANSACTION_TOPIC
+        value: transaction-events
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false
+      - key: SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL
+        sync: false
+      - key: SPRING_KAFKA_PROPERTIES_SASL_MECHANISM
+        sync: false
+      - key: SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG
+        sync: false
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: CLAUDE_MODEL
+        value: claude-3-5-sonnet-latest
+      - key: CLAUDE_VERSION
+        value: 2023-06-01
+
+  - type: keyvalue
+    name: ledger-cache
+    plan: starter
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+databases:
+  - name: ledger-db
+    plan: basic-256mb
+    ipAllowList: []
