@@ -1,6 +1,6 @@
 # Ledger
 
-Spring Boot transaction auditing service with event sourcing, Kafka-based async processing, Redis idempotency, PostgreSQL event storage, and Claude-powered audit decisions.
+Spring Boot transaction auditing service with event sourcing, Kafka-based async processing, Redis idempotency, PostgreSQL event storage, and AI-powered audit decisions.
 
 ## Local run
 
