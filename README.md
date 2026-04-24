@@ -53,17 +53,6 @@ Blueprint-managed resources:
 - `ledger-db` Postgres
 - `ledger-cache` Render Key Value
 
-You still need to provide:
-
-- `KAFKA_BOOTSTRAP_SERVERS`
-- `CLAUDE_API_KEY`
-
-Optional Kafka auth env vars for hosted providers:
-
-- `SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL`
-- `SPRING_KAFKA_PROPERTIES_SASL_MECHANISM`
-- `SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG`
-
 The app accepts Render-style connection URLs:
 
 - `DATABASE_URL=postgresql://...`
