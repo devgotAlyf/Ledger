@@ -10,9 +10,12 @@ spring:
     timeout-per-shutdown-phase: 20s
 
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/ledger}
-    username: ${POSTGRES_USERNAME:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+  flyway:
+    enabled: false
 
   data:
     redis:
@@ -25,16 +28,15 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update   # safer for first deploy
     properties:
       hibernate:
         jdbc:
           time_zone: UTC
 
   kafka:
-    # IMPORTANT: empty by default → disables Kafka if not provided
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:}
-    
+
     consumer:
       enabled: ${KAFKA_ENABLED:false}
       group-id: transaction-audit-service
