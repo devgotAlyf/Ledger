@@ -53,6 +53,12 @@ Blueprint-managed resources:
 - `ledger-db` Postgres
 - `ledger-cache` Render Key Value
 
+Optional AI env vars for production audit decisions:
+
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL=gemini-2.5-flash`
+- `GEMINI_VERSION=v1beta`
+
 The app accepts Render-style connection URLs:
 
 - `DATABASE_URL=postgresql://...`

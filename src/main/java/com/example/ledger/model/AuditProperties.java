@@ -5,14 +5,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "audit")
 public record AuditProperties(
         Kafka kafka,
-        Claude claude
+        Gemini gemini
 ) {
     public record Kafka(
             String transactionTopic
     ) {
     }
 
-    public record Claude(
+    public record Gemini(
             String apiKey,
             String baseUrl,
             String model,

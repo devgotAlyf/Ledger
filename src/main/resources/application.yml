@@ -47,11 +47,11 @@ spring:
 audit:
   kafka:
     transaction-topic: ${TRANSACTION_TOPIC:transaction-events}
-  claude:
-    api-key: ${CLAUDE_API_KEY:}
-    base-url: ${CLAUDE_BASE_URL:https://api.anthropic.com}
-    model: ${CLAUDE_MODEL:claude-3-5-sonnet-latest}
-    version: ${CLAUDE_VERSION:2023-06-01}
+  gemini:
+    api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    version: ${GEMINI_VERSION:v1beta}
 
 springdoc:
   swagger-ui:

@@ -27,12 +27,12 @@ services:
         sync: false
       - key: SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG
         sync: false
-      - key: CLAUDE_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
-      - key: CLAUDE_MODEL
-        value: claude-3-5-sonnet-latest
-      - key: CLAUDE_VERSION
-        value: 2023-06-01
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_VERSION
+        value: v1beta
 
   - type: keyvalue
     name: ledger-cache

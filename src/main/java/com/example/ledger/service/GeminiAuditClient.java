@@ -20,14 +20,14 @@ import java.util.Optional;
 
 @Service
 @Profile("!local")
-public class ClaudeAuditClient implements AuditDecisionClient {
+public class GeminiAuditClient implements AuditDecisionClient {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
-    private final AuditProperties.Claude properties;
+    private final AuditProperties.Gemini properties;
     private final WebClient webClient;
 
-    public ClaudeAuditClient(WebClient.Builder webClientBuilder, AuditProperties auditProperties) {
-        this.properties = auditProperties.claude();
+    public GeminiAuditClient(WebClient.Builder webClientBuilder, AuditProperties auditProperties) {
+        this.properties = auditProperties.gemini();
         this.webClient = webClientBuilder
                 .baseUrl(this.properties.baseUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -37,27 +37,29 @@ public class ClaudeAuditClient implements AuditDecisionClient {
     @Override
     public AiAuditDecision audit(TransactionEvent event, BigDecimal averageSpend) {
         if (!StringUtils.hasText(properties.apiKey())) {
-            throw new IllegalStateException("CLAUDE_API_KEY is required");
+            throw new IllegalStateException("GEMINI_API_KEY is required");
         }
 
-        ClaudeResponse response = webClient.post()
-                .uri("/v1/messages")
-                .header("x-api-key", properties.apiKey())
-                .header("anthropic-version", properties.version())
-                .bodyValue(new ClaudeRequest(
-                        properties.model(),
-                        128,
-                        0,
-                        List.of(new ClaudeMessage("user", buildPrompt(event, averageSpend)))
+        GeminiResponse response = webClient.post()
+                .uri("/{version}/models/{model}:generateContent", properties.version(), properties.model())
+                .header("x-goog-api-key", properties.apiKey())
+                .bodyValue(new GeminiRequest(
+                        new SystemInstruction(List.of(new Part("You are a financial auditor."))),
+                        List.of(new Content(List.of(new Part(buildPrompt(event, averageSpend))))),
+                        new GenerationConfig(0, "text/plain")
                 ))
                 .retrieve()
-                .bodyToMono(ClaudeResponse.class)
+                .bodyToMono(GeminiResponse.class)
                 .block(TIMEOUT);
 
         String reply = Optional.ofNullable(response)
-                .map(ClaudeResponse::content)
-                .filter(content -> !content.isEmpty())
-                .map(content -> content.get(0).text())
+                .map(GeminiResponse::candidates)
+                .filter(candidates -> !candidates.isEmpty())
+                .map(candidates -> candidates.get(0))
+                .map(Candidate::content)
+                .map(Content::parts)
+                .filter(parts -> !parts.isEmpty())
+                .map(parts -> parts.get(0).text())
                 .orElse("");
 
         return parseDecision(reply);
@@ -65,7 +67,6 @@ public class ClaudeAuditClient implements AuditDecisionClient {
 
     private String buildPrompt(TransactionEvent event, BigDecimal averageSpend) {
         return """
-                You are a financial auditor.
                 Amount: \u20b9%s
                 Merchant: %s
                 Avg spend: \u20b9%s
@@ -101,33 +102,46 @@ public class ClaudeAuditClient implements AuditDecisionClient {
 
         return new AiAuditDecision(
                 EventType.FLAGGED,
-                EventType.FLAGGED.name() + ": Claude response could not be parsed",
-                "Claude response could not be parsed"
+                EventType.FLAGGED.name() + ": Gemini response could not be parsed",
+                "Gemini response could not be parsed"
         );
     }
 
-    private record ClaudeRequest(
-            String model,
-            @JsonProperty("max_tokens") int maxTokens,
-            double temperature,
-            List<ClaudeMessage> messages
+    private record GeminiRequest(
+            @JsonProperty("system_instruction") SystemInstruction systemInstruction,
+            List<Content> contents,
+            GenerationConfig generationConfig
     ) {
     }
 
-    private record ClaudeMessage(
-            String role,
-            String content
+    private record SystemInstruction(
+            List<Part> parts
     ) {
     }
 
-    private record ClaudeResponse(
-            List<ClaudeContent> content
+    private record Content(
+            List<Part> parts
     ) {
     }
 
-    private record ClaudeContent(
-            String type,
+    private record Part(
             String text
+    ) {
+    }
+
+    private record GenerationConfig(
+            double temperature,
+            String responseMimeType
+    ) {
+    }
+
+    private record GeminiResponse(
+            List<Candidate> candidates
+    ) {
+    }
+
+    private record Candidate(
+            Content content
     ) {
     }
 }
