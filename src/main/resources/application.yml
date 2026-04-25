@@ -5,12 +5,15 @@ server:
 spring:
   application:
     name: ledger
+
   lifecycle:
     timeout-per-shutdown-phase: 20s
+
   datasource:
     url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/ledger}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -18,6 +21,7 @@ spring:
       timeout: 2s
       repositories:
         enabled: false
+
   jpa:
     open-in-view: false
     hibernate:
@@ -26,9 +30,13 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+
   kafka:
+    # IMPORTANT: empty by default → disables Kafka if not provided
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:}
+    
     consumer:
+      enabled: ${KAFKA_ENABLED:false}
       group-id: transaction-audit-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -38,7 +46,9 @@ spring:
         spring.json.trusted.packages: com.example.ledger.model
         spring.json.value.default.type: com.example.ledger.model.TransactionEvent
         spring.json.use.type.headers: false
+
     producer:
+      enabled: ${KAFKA_ENABLED:false}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
@@ -47,6 +57,7 @@ spring:
 audit:
   kafka:
     transaction-topic: ${TRANSACTION_TOPIC:transaction-events}
+
   gemini:
     api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
     base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
@@ -58,5 +69,6 @@ springdoc:
     path: /swagger-ui.html
     try-it-out-enabled: true
     operations-sorter: method
+
   api-docs:
     path: /v3/api-docs
