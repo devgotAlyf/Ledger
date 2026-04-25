@@ -1,14 +1,15 @@
 package com.example.ledger.kafka;
 
+import com.example.ledger.config.KafkaNotConfiguredCondition;
 import com.example.ledger.model.TransactionEvent;
 import com.example.ledger.service.TransactionAuditService;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
 @Component
-@Profile("local")
+@Conditional(KafkaNotConfiguredCondition.class)
 public class LocalTransactionPublisher implements TransactionEventPublisher {
 
     private final TransactionAuditService transactionAuditService;

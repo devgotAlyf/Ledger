@@ -1,14 +1,17 @@
 package com.example.ledger.kafka;
 
+import com.example.ledger.config.KafkaConfiguredCondition;
 import com.example.ledger.guard.IdempotencyGuard;
 import com.example.ledger.model.TransactionEvent;
 import com.example.ledger.service.TransactionAuditService;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!local")
+@Conditional(KafkaConfiguredCondition.class)
 public class TransactionAuditConsumer {
 
     private final IdempotencyGuard idempotencyGuard;
