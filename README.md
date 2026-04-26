@@ -1,21 +1,7 @@
 # Ledger
 
 Spring Boot transaction auditing service with event sourcing, Kafka-based async processing, Redis idempotency, PostgreSQL event storage, and AI-powered audit decisions.
-
-## Local run
-
 Run the app in local mode with the in-repo Maven install:
-
-```powershell
-$env:SPRING_PROFILES_ACTIVE="local"
-.\.tools\apache-maven-3.9.15\bin\mvn.cmd spring-boot:run
-```
-
-Open:
-
-- `http://localhost:8080/`
-- `http://localhost:8080/healthz`
-- `http://localhost:8080/swagger-ui.html`
 
 ## Local test flow
 
@@ -52,16 +38,5 @@ Blueprint-managed resources:
 - `ledger-api` web service
 - `ledger-db` Postgres
 - `ledger-cache` Render Key Value
-
-Optional AI env vars for production audit decisions:
-
-- `GEMINI_API_KEY`
-- `GEMINI_MODEL=gemini-2.5-flash`
-- `GEMINI_VERSION=v1beta`
-
-The app accepts Render-style connection URLs:
-
-- `DATABASE_URL=postgresql://...`
-- `REDIS_URL=redis://...`
 
 These are translated automatically into Spring-compatible settings at startup.
